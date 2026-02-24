@@ -1,4 +1,4 @@
-def calculadorasuma(a,b):
+def calculadora(a,b):
     return a+b
 
 if __name__ == '__main__':
