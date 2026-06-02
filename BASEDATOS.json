@@ -1,0 +1,512 @@
+{
+  "categorias": [
+    {
+      "id": "cat_cafes",
+      "nombre": "CAFÉS"
+    },
+    {
+      "id": "cat_refrescos",
+      "nombre": "REFRESCOS"
+    },
+    {
+      "id": "cat_cervezas",
+      "nombre": "CERVEZAS"
+    },
+    {
+      "id": "cat_alcohol",
+      "nombre": "ALCOHOL"
+    },
+    {
+      "id": "cat_combinados",
+      "nombre": "COMBINADOS"
+    },
+    {
+      "id": "cat_tapas",
+      "nombre": "TAPAS"
+    },
+    {
+      "id": "cat_bocadillos",
+      "nombre": "BOCADILLOS"
+    },
+    {
+      "id": "cat_carnes",
+      "nombre": "CARNES"
+    },
+    {
+      "id": "cat_pescados",
+      "nombre": "PESCADOS"
+    },
+    {
+      "id": "cat_ensaladas",
+      "nombre": "ENSALADAS"
+    },
+    {
+      "id": "cat_postres",
+      "nombre": "POSTRES"
+    }
+  ],
+  "productos": [
+    {
+      "id": "prod_caf_bombon",
+      "categoria_id": "cat_cafes",
+      "nombre": "Café Bombón",
+      "precio": 1.8
+    },
+    {
+      "id": "prod_caf_cortado",
+      "categoria_id": "cat_cafes",
+      "nombre": "Café Cortado",
+      "precio": 1.3
+    },
+    {
+      "id": "prod_caf_leche",
+      "categoria_id": "cat_cafes",
+      "nombre": "Café con Leche",
+      "precio": 1.5
+    },
+    {
+      "id": "prod_caf_solo",
+      "categoria_id": "cat_cafes",
+      "nombre": "Café Solo",
+      "precio": 1.3
+    },
+    {
+      "id": "prod_caf_carajillo",
+      "categoria_id": "cat_cafes",
+      "nombre": "Carajillo",
+      "precio": 1.8
+    },
+    {
+      "id": "prod_caf_infusion",
+      "categoria_id": "cat_cafes",
+      "nombre": "Infusión",
+      "precio": 1.5
+    },
+    {
+      "id": "prod_ref_cocacola",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Coca-Cola",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_cocacolazero",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Coca-Cola Zero",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_nestea",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Nestea",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_redbull",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Red Bull",
+      "precio": 3.0
+    },
+    {
+      "id": "prod_ref_fantanaranja",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Fanta Naranja",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_fantalimon",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Fanta Limón",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_aquariusnaranja",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Aquarius Naranja",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_aquariuslimon",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Aquarius Limón",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_bitterkas",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Bitter Kas",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_vichy",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Vichy Catalan",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_lacasera",
+      "categoria_id": "cat_refrescos",
+      "nombre": "La casera",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_ref_agua",
+      "categoria_id": "cat_refrescos",
+      "nombre": "Agua",
+      "precio": 1.5
+    },
+    {
+      "id": "prod_cer_aguila",
+      "categoria_id": "cat_cervezas",
+      "nombre": "El Águila",
+      "precio": 2.8
+    },
+    {
+      "id": "prod_cer_alhambra",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Alhambra",
+      "precio": 3.0
+    },
+    {
+      "id": "prod_cer_mahou",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Mahou",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_sanmiguel",
+      "categoria_id": "cat_cervezas",
+      "nombre": "San Miguel",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_amstel",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Amstel",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_estrellagalicia",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Estrella Galicia",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_heineken",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Heineken",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_estrelladamm",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Estrella Damm",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_cruzcampo",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Cruzcampo",
+      "precio": 2.0
+    },
+    {
+      "id": "prod_cer_ambar",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Ambar",
+      "precio": 2.5
+    },
+    {
+      "id": "prod_cer_turia",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Turia",
+      "precio": 3.0
+    },
+    {
+      "id": "prod_cer_guiness",
+      "categoria_id": "cat_cervezas",
+      "nombre": "Guiness",
+      "precio": 3.0
+    },
+    {
+      "id": "prod_alc_chupito",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Chupito",
+      "precio": 2.0
+    },
+    {
+      "id": "prod_alc_cubata",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Cubata",
+      "precio": 7.0
+    },
+    {
+      "id": "prod_alc_copasolo",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Copa Solo",
+      "precio": 7.0
+    },
+    {
+      "id": "prod_alc_mojito",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Mojito",
+      "precio": 6.0
+    },
+    {
+      "id": "prod_alc_vermut",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Vermut",
+      "precio": 6.0
+    },
+    {
+      "id": "prod_alc_vino",
+      "categoria_id": "cat_alcohol",
+      "nombre": "Vino",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_com_lomohuevo",
+      "categoria_id": "cat_combinados",
+      "nombre": "Lomo con huevo y patatas",
+      "precio": 9.5
+    },
+    {
+      "id": "prod_com_pechugahuevo",
+      "categoria_id": "cat_combinados",
+      "nombre": "Pechuga con patatas y huevo",
+      "precio": 9.5
+    },
+    {
+      "id": "prod_com_hamburguesa",
+      "categoria_id": "cat_combinados",
+      "nombre": "Hamburguesa con patatas",
+      "precio": 9.5
+    },
+    {
+      "id": "prod_com_butifarra",
+      "categoria_id": "cat_combinados",
+      "nombre": "Butifarra con judías blancas",
+      "precio": 9.5
+    },
+    {
+      "id": "prod_boc_bacon",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo de Bacon y Queso",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_boc_calamares",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo de Calamares",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_boc_serranito",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Serranito",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_boc_pollo",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo de Pollo",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_boc_tortilla",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo de Tortilla",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_boc_vegetal",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo Vegetal",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_boc_embutido",
+      "categoria_id": "cat_bocadillos",
+      "nombre": "Bocadillo de Embutido",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_bravas",
+      "categoria_id": "cat_tapas",
+      "nombre": "Patatas Bravas",
+      "precio": 4.0
+    },
+    {
+      "id": "prod_tap_jamon",
+      "categoria_id": "cat_tapas",
+      "nombre": "Jamón Ibérico",
+      "precio": 6.0
+    },
+    {
+      "id": "prod_tap_chipirones",
+      "categoria_id": "cat_tapas",
+      "nombre": "Chipirones",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_tap_aceitunas",
+      "categoria_id": "cat_tapas",
+      "nombre": "Aceitunas",
+      "precio": 3.0
+    },
+    {
+      "id": "prod_tap_tortilla",
+      "categoria_id": "cat_tapas",
+      "nombre": "Pincho de Tortilla",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_torreznos",
+      "categoria_id": "cat_tapas",
+      "nombre": "Torreznos",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_croquetas",
+      "categoria_id": "cat_tapas",
+      "nombre": "Croquetas",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_lacon",
+      "categoria_id": "cat_tapas",
+      "nombre": "Lacón",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_calamares",
+      "categoria_id": "cat_tapas",
+      "nombre": "Calamares",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_tap_pulpo",
+      "categoria_id": "cat_tapas",
+      "nombre": "Pulpo Gallega",
+      "precio": 6.0
+    },
+    {
+      "id": "prod_car_bistec",
+      "categoria_id": "cat_carnes",
+      "nombre": "Bistec",
+      "precio": 12.5
+    },
+    {
+      "id": "prod_car_carrilleras",
+      "categoria_id": "cat_carnes",
+      "nombre": "Carrileras",
+      "precio": 10.5
+    },
+    {
+      "id": "prod_car_costillas",
+      "categoria_id": "cat_carnes",
+      "nombre": "Costillas",
+      "precio": 10.5
+    },
+    {
+      "id": "prod_car_entrecot",
+      "categoria_id": "cat_carnes",
+      "nombre": "Entrecot",
+      "precio": 15.5
+    },
+    {
+      "id": "prod_car_toro",
+      "categoria_id": "cat_carnes",
+      "nombre": "Rabo de toro",
+      "precio": 12.5
+    },
+    {
+      "id": "prod_car_solomillo",
+      "categoria_id": "cat_carnes",
+      "nombre": "Solomillo",
+      "precio": 18.0
+    },
+    {
+      "id": "prod_pes_tataki",
+      "categoria_id": "cat_pescados",
+      "nombre": "Tataki de Atún",
+      "precio": 14.5
+    },
+    {
+      "id": "prod_pes_rape",
+      "categoria_id": "cat_pescados",
+      "nombre": "Rape",
+      "precio": 12.5
+    },
+    {
+      "id": "prod_pes_salmon",
+      "categoria_id": "cat_pescados",
+      "nombre": "Salmón",
+      "precio": 14.5
+    },
+    {
+      "id": "prod_pes_merluza",
+      "categoria_id": "cat_pescados",
+      "nombre": "Merluza",
+      "precio": 12.5
+    },
+    {
+      "id": "prod_pes_bacalao",
+      "categoria_id": "cat_pescados",
+      "nombre": "Bacalao",
+      "precio": 12.5
+    },
+    {
+      "id": "prod_ens_mixta",
+      "categoria_id": "cat_ensaladas",
+      "nombre": "Ensalada Mixta",
+      "precio": 8.0
+    },
+    {
+      "id": "prod_ens_tomate",
+      "categoria_id": "cat_ensaladas",
+      "nombre": "Ensalada de Tomate",
+      "precio": 8.0
+    },
+    {
+      "id": "prod_ens_mediterranea",
+      "categoria_id": "cat_ensaladas",
+      "nombre": "Ensalada Mediterránea",
+      "precio": 8.0
+    },
+    {
+      "id": "prod_ens_cesar",
+      "categoria_id": "cat_ensaladas",
+      "nombre": "Ensalada César",
+      "precio": 8.0
+    },
+    {
+      "id": "prod_pos_tartaqueso",
+      "categoria_id": "cat_postres",
+      "nombre": "Tarta de queso",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_pos_coulant",
+      "categoria_id": "cat_postres",
+      "nombre": "Coulant de chocolate",
+      "precio": 5.0
+    },
+    {
+      "id": "prod_pos_helado",
+      "categoria_id": "cat_postres",
+      "nombre": "Helado",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_pos_fruta",
+      "categoria_id": "cat_postres",
+      "nombre": "Fruta",
+      "precio": 4.5
+    },
+    {
+      "id": "prod_pos_tiramisu",
+      "categoria_id": "cat_postres",
+      "nombre": "Tiramisú",
+      "precio": 5.0
+    }
+  ]
+}
