@@ -13,6 +13,8 @@ class TPVApp(QMainWindow):
     def __init__(self, rol="camarero"):
         super().__init__()
         self.rol = rol  # Guardamos el rol ('admin' o 'camarero') viene desde el Login
+        self.rol_elegido = rol  # Control interno para cambios dinámicos de usuario
+        self.total_actual = 0.0  # Rastreador de dinero acumulado de la mesa activa
 
         # 1. Cargamos tu interfaz gráfica
         loadUi("Diseño.ui", self)
@@ -37,7 +39,7 @@ class TPVApp(QMainWindow):
         if not self.layout_productos:
             self.layout_productos = QGridLayout(self.stackedWidget.currentWidget())
 
-        # 5. Inicializar paneles visuale
+        # 5. Inicializar paneles visuales (Aquí se crean los botones dinámicamente)
         self.configurar_panel_factura()
         self.configurar_panel_mesas()
 
@@ -56,13 +58,11 @@ class TPVApp(QMainWindow):
             with open("BASEDATOS.json", "r", encoding="utf-8") as archivo:
                 return json.load(archivo)
         except json.JSONDecodeError:
-            # Si tu archivo JSON se corrompió con el error de la captura, esto evita que el programa muera
             QMessageBox.warning(self, "Error de Base de Datos",
                                 "El archivo BASEDATOS.json tiene un error de formato. Revisa que las llaves estén bien cerradas.")
             return {"categorias": [], "productos": []}
 
     def guardar_json(self):
-        # Ahora solo guardamos productos y categorías, las mesas no se tocan
         datos_a_guardar = {
             "categorias": self.datos_tpv.get("categorias", self.datos_tpv.get("categories", [])),
             "productos": self.datos_tpv.get("productos", [])
@@ -75,9 +75,14 @@ class TPVApp(QMainWindow):
         if not layout_factura:
             layout_factura = QVBoxLayout(self.frame_FACTURA)
 
+        # Añadimos margen general al panel para que respire
+        layout_factura.setContentsMargins(10, 10, 10, 10)
+        layout_factura.setSpacing(10)
+
         if hasattr(self, 'btn_fondo_2'):
             self.btn_fondo_2.deleteLater()
 
+        # --- TABLA DE FACTURA (Un poco más compacta) ---
         self.tabla_factura = QTableWidget()
         self.tabla_factura.setColumnCount(3)
         self.tabla_factura.setHorizontalHeaderLabels(["Producto", "Cant.", "Precio"])
@@ -93,61 +98,99 @@ class TPVApp(QMainWindow):
                 border: 1px solid #333333; font-size: 14px; border-radius: 5px;
             }
             QHeaderView::section {
-                background-color: #1a1a1a; color: #ffffff; padding: 7px;
+                background-color: #1a1a1a; color: #ffffff; padding: 6px;
                 border: 1px solid #333333; font-weight: bold; font-size: 13px;
             }
         """)
         self.tabla_factura.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.tabla_factura.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
 
+        # --- BLOQUE INFERIOR DE CONTROL DE CUENTA ---
         layout_inferior_bloque = QVBoxLayout()
+        layout_inferior_bloque.setSpacing(12)  # Separación elegante entre filas
 
+        # 0. Fila Notificación superior
         self.lbl_notificacion = QLabel()
         self.lbl_notificacion.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_notificacion.setMinimumHeight(35)
         self.lbl_notificacion.setStyleSheet(
-            "background-color: #34495e; color: #ecf0f1; font-weight: bold; border-radius: 5px; font-size: 14px;")
+            "background-color: #34495e; color: #ecf0f1; font-weight: bold; border-radius: 5px; font-size: 13px;")
 
-        layout_controles = QHBoxLayout()
+        # 1. FILA: TOTAL A PAGAR (+ botón admin si corresponde)
+        layout_fila_total = QHBoxLayout()
         self.lbl_total = QLabel("SELECCIONE MESA")
-        self.lbl_total.setStyleSheet("color: #e67e22; font-size: 26px; font-weight: bold; padding-left: 5px;")
+        self.lbl_total.setStyleSheet("color: #e67e22; font-size: 24px; font-weight: bold; padding-left: 2px;")
+        layout_fila_total.addWidget(self.lbl_total)
+        layout_fila_total.addStretch()
 
-        if self.rol == "admin":
-            self.btn_admin_panel = QPushButton("⚙️ ADMIN")
-            self.btn_admin_panel.setMinimumSize(90, 45)
-            self.btn_admin_panel.setStyleSheet("""
-                QPushButton { background-color: #d35400; color: white; font-weight: bold; font-size: 13px; border-radius: 6px; border: 1px solid #e67e22; }
-                QPushButton:hover { background-color: #e67e22; }
-            """)
-            self.btn_admin_panel.clicked.connect(self.abrir_panel_administracion)
-            layout_controles.addWidget(self.btn_admin_panel)
+        # CORRECCIÓN: El botón se crea SIEMPRE para que viva en memoria pase lo que pase
+        self.btn_admin_panel = QPushButton("⚙️ ADMIN")
+        self.btn_admin_panel.setMinimumSize(90, 38)
+        self.btn_admin_panel.setStyleSheet("""
+                    QPushButton { background-color: #d35400; color: white; font-weight: bold; font-size: 12px; border-radius: 5px; }
+                    QPushButton:hover { background-color: #e67e22; }
+                """)
+        self.btn_admin_panel.clicked.connect(self.abrir_panel_administracion)
+        layout_fila_total.addWidget(self.btn_admin_panel)
 
-        self.btn_borrar_ultimo = QPushButton("BORRAR")
-        self.btn_borrar_ultimo.setMinimumSize(90, 45)
+        # Lo ocultamos o mostramos de inmediato según el rol de arranque actual
+        self.btn_admin_panel.setVisible(self.rol == "admin")
+
+        # 2. FILA: ACCIONES PRINCIPALES (BORRAR Y COBRAR)
+        layout_fila_acciones = QHBoxLayout()
+        layout_fila_acciones.setSpacing(10)
+
+        self.btn_borrar_ultimo = QPushButton("🗑️ BORRAR ÚLTIMO")
+        self.btn_borrar_ultimo.setMinimumHeight(42)
         self.btn_borrar_ultimo.setStyleSheet("""
-            QPushButton { background-color: #e74c3c; color: white; font-weight: bold; font-size: 13px; border-radius: 6px; border: none; }
+            QPushButton { background-color: #e74c3c; color: white; font-weight: bold; font-size: 13px; border-radius: 5px; border: none; }
             QPushButton:hover { background-color: #c0392b; }
         """)
         self.btn_borrar_ultimo.clicked.connect(self.borrar_ultimo_producto)
 
-        self.btn_cobrar = QPushButton("COBRAR")
-        self.btn_cobrar.setMinimumSize(100, 45)
+        self.btn_cobrar = QPushButton("💰 COBRAR CUENTA")
+        self.btn_cobrar.setMinimumHeight(42)
         self.btn_cobrar.setStyleSheet("""
-            QPushButton { background-color: #27ae60; color: white; font-weight: bold; font-size: 13px; border-radius: 6px; border: none; }
+            QPushButton { background-color: #27ae60; color: white; font-weight: bold; font-size: 13px; border-radius: 5px; border: none; }
             QPushButton:hover { background-color: #2ecc71; }
         """)
         self.btn_cobrar.clicked.connect(self.finalizar_cuenta)
 
-        layout_controles.addWidget(self.lbl_total)
-        layout_controles.addStretch()
-        layout_controles.addWidget(self.btn_borrar_ultimo)
-        layout_controles.addWidget(self.btn_cobrar)
+        layout_fila_acciones.addWidget(self.btn_borrar_ultimo, stretch=1)
+        layout_fila_acciones.addWidget(self.btn_cobrar, stretch=1)
 
+        # 3. FILA INFERIOR: HERRAMIENTAS ADICIONALES (DIVIDIR Y CAMBIAR EMPLEADO)
+        layout_fila_herramientas = QHBoxLayout()
+        layout_fila_herramientas.setSpacing(10)
+
+        self.btn_dividir = QPushButton("➗ DIVIDIR CUENTA")
+        self.btn_dividir.setMinimumHeight(40)
+        self.btn_dividir.setStyleSheet("""
+            QPushButton { background-color: #8e44ad; color: white; font-weight: bold; font-size: 13px; border-radius: 5px; border: none; }
+            QPushButton:hover { background-color: #9b59b6; }
+        """)
+        self.btn_dividir.clicked.connect(self.llamar_dividir_cuenta)
+
+        self.btn_cambiar_usuario = QPushButton("🔄 CAMBIAR EMPLEADO")
+        self.btn_cambiar_usuario.setMinimumHeight(40)
+        self.btn_cambiar_usuario.setStyleSheet("""
+            QPushButton { background-color: #2980b9; color: white; font-weight: bold; font-size: 13px; border-radius: 5px; border: none; }
+            QPushButton:hover { background-color: #3498db; }
+        """)
+        self.btn_cambiar_usuario.clicked.connect(self.llamar_cambio_usuario)
+
+        layout_fila_herramientas.addWidget(self.btn_dividir, stretch=1)
+        layout_fila_herramientas.addWidget(self.btn_cambiar_usuario, stretch=1)
+
+        # --- ENSAMBLAJE DE LAS CAPAS ---
         layout_inferior_bloque.addWidget(self.lbl_notificacion)
-        layout_inferior_bloque.addLayout(layout_controles)
+        layout_inferior_bloque.addLayout(layout_fila_total)
+        layout_inferior_bloque.addLayout(layout_fila_acciones)
+        layout_inferior_bloque.addLayout(layout_fila_herramientas)
 
-        layout_factura.addWidget(self.tabla_factura)
-        layout_factura.addLayout(layout_inferior_bloque)
+        # Distribuimos el espacio vertical (65% para la tabla, 35% para los botones de control)
+        layout_factura.addWidget(self.tabla_factura, stretch=65)
+        layout_factura.addLayout(layout_inferior_bloque, stretch=35)
 
     def configurar_panel_mesas(self):
         if hasattr(self, "frame_MESAS"):
@@ -190,7 +233,6 @@ class TPVApp(QMainWindow):
         self.actualizar_estilos_mesas()
 
     def actualizar_estilos_mesas(self):
-        # Cambiado el formato para evitar el NameError de las llaves CSS
         for nombre_m, btn in self.botones_mesas.items():
             tiene_productos = len(self.mesas[nombre_m]["ticket"]) > 0
             es_la_actual = (self.mesa_actual == nombre_m)
@@ -206,7 +248,6 @@ class TPVApp(QMainWindow):
             border = "2.5px solid #2980b9" if es_la_actual else "1px solid #2c3e50"
             font_weight = "bold" if es_la_actual else "normal"
 
-            # Construcción segura de estilo sin conflictos con llaves f-string
             estilo = "QPushButton { background-color: " + bg_color + "; color: " + text_color + "; border: " + border + "; font-weight: " + font_weight + "; border-radius: 5px; font-size: 11px; } "
             estilo += "QPushButton:hover { background-color: #2c3e50; color: white; }"
             btn.setStyleSheet(estilo)
@@ -331,11 +372,14 @@ class TPVApp(QMainWindow):
                 self.tabla_factura.setItem(fila, 0, item_nombre)
                 self.tabla_factura.setItem(fila, 1, item_cant)
                 self.tabla_factura.setItem(fila, 2, item_precio)
-            self.lbl_total.setText(f"TOTAL A PAGAR: {total_general:.2f}€")
-            self.lbl_total.setStyleSheet("color: #2ecc71; font-size: 28px; font-weight: bold; padding-left: 5px;")
+
+            self.total_actual = total_general
+            self.lbl_total.setText(f"TOTAL: {total_general:.2f}€")
+            self.lbl_total.setStyleSheet("color: #2ecc71; font-size: 26px; font-weight: bold; padding-left: 2px;")
         else:
+            self.total_actual = 0.0
             self.lbl_total.setText("SELECCIONE MESA")
-            self.lbl_total.setStyleSheet("color: #e67e22; font-size: 26px; font-weight: bold; padding-left: 5px;")
+            self.lbl_total.setStyleSheet("color: #e67e22; font-size: 24px; font-weight: bold; padding-left: 2px;")
 
     def finalizar_cuenta(self):
         if not self.mesa_actual: return
@@ -453,9 +497,28 @@ class TPVApp(QMainWindow):
 
         dialogo.exec()
 
+    # --- LÓGICA MODULAR DE ENLACE DE SCRIPTS EXTERNOS ---
+    def llamar_dividir_cuenta(self):
+        modulo_dividir = __import__("Dividir cuenta")
+        modulo_dividir.abrir_dividir_cuenta(self)
+
+    def llamar_cambio_usuario(self):
+        modulo_cambio = __import__("Cambio de usuario")
+        modulo_cambio.abrir_cambio_usuario(self)
+
+        if hasattr(self, 'rol_elegido'):
+            self.rol = self.rol_elegido
+
+            # CORRECCIÓN: Forzamos de inmediato al botón a actualizar su visibilidad en pantalla
+            if hasattr(self, 'btn_admin_panel'):
+                self.btn_admin_panel.setVisible(self.rol == "admin")
+
+            if self.mesa_actual:
+                self.seleccionar_mesa(self.mesa_actual)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ventana = TPVApp(rol="admin")  # Por si lo ejecutas suelto para pruebas
+    ventana = TPVApp(rol="admin")
     ventana.show()
     sys.exit(app.exec())
