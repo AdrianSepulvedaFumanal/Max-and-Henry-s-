@@ -37,7 +37,7 @@ class TPVApp(QMainWindow):
         if not self.layout_productos:
             self.layout_productos = QGridLayout(self.stackedWidget.currentWidget())
 
-        # 5. Inicializar paneles visuales
+        # 5. Inicializar paneles visuale
         self.configurar_panel_factura()
         self.configurar_panel_mesas()
 

@@ -106,7 +106,7 @@ class TPVApp(QMainWindow):
             # Ruta de la imagen asociada al ID
             ruta_imagen = f"imagenes/{prod['id']}.jpg"
 
-            # Si la imagen no existe, ponemos un color gris con el nombre para que no falle
+            # Si la imagen no existe, ponemos un color gris con el nombre para que no fall
             if os.path.exists(ruta_imagen):
                 boton_prod.setStyleSheet(f"""
                     QPushButton {{

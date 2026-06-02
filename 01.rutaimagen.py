@@ -20,7 +20,7 @@ for prod in productos_filtrados:
         }}
     """)
 
-    # 4. Guardamos los datos del producto dentro del propio botón para saber cuál se pulsa
+    # 4. Guardamos los datos del producto dentro del propio botón para saber cuál se puls
     boton.clicked.connect(lambda checked, p=prod: self.producto_pulsado(p))
 
     # 5. Lo añadimos a la cuadrícula (malla)
