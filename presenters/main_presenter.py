@@ -1,6 +1,7 @@
 import os
-from PyQt6.QtWidgets import QPushButton, QGridLayout, QTableWidgetItem, QDialog, QVBoxLayout, QLabel, QListWidget, \
-    QHBoxLayout, QInputDialog
+from PyQt6.QtWidgets import (QPushButton, QGridLayout, QTableWidgetItem,
+                             QDialog, QVBoxLayout, QLabel, QListWidget,
+                             QHBoxLayout, QInputDialog, QMessageBox)
 from PyQt6.QtCore import Qt
 from models.database import DataBaseModel
 from views.main_view import MainView
@@ -10,7 +11,6 @@ class MainPresenter:
     def __init__(self, view: MainView, model: DataBaseModel):
         self.view = view
         self.model = model
-
         self.botones_mesas = {}
 
         # 1. Asegurar layouts dinámicos en los contenedores de la Vista
@@ -19,31 +19,32 @@ class MainPresenter:
         else:
             self.layout_categorias = self.view.frame_PRODUCTOS.layout()
 
-        # Forzamos un QGridLayout limpio en la página actual del stackedWidget para los productos
         widget_actual_productos = self.view.stackedWidget.currentWidget()
         if widget_actual_productos.layout() is None:
             self.layout_productos = QGridLayout(widget_actual_productos)
         else:
             self.layout_productos = widget_actual_productos.layout()
 
-        # 2. Configurar y pintar las mesas en su panel (Corregido: Llamada única)
+        # 2. Configurar mesas
         self.configurar_panel_mesas()
 
-        # 3. Conectar los botones fijos del panel lateral a sus funciones
+        # 3. Conectar botones fijos
         self.view.btn_borrar_ultimo.clicked.connect(self.borrar_ultimo_producto)
         self.view.btn_cobrar.clicked.connect(self.finalizar_cuenta)
         self.view.btn_admin_panel.clicked.connect(self.abrir_panel_administracion)
-        self.view.btn_dividir.clicked.connect(self.llamar_dividir_cuenta)
-        self.view.btn_cambiar_usuario.clicked.connect(self.llamar_cambio_usuario)
+        self.view.btn_dividir.clicked.connect(self.dividir_cuenta)
+        self.view.btn_cambiar_usuario.clicked.connect(self.cambiar_usuario)
 
-        # 4. Forzar visibilidad del botón ADMIN según el rol inicial del modelo
+        # 4. Visibilidad del botón ADMIN según rol inicial
         self.view.btn_admin_panel.setVisible(self.model.rol_actual == "admin")
 
-        # 5. Dibujar categorías iniciales y seleccionar la Mesa 1 por defecto
+        # 5. Dibujar categorías y seleccionar Mesa 1
         self.dibujar_categorias()
         self.seleccionar_mesa("Mesa 1")
 
-    # --- SISTEMA DE MESAS ---
+    # -------------------------------------------------------------------------
+    # SISTEMA DE MESAS
+    # -------------------------------------------------------------------------
     def configurar_panel_mesas(self):
         contenedor_mesas = getattr(self.view, "frame_MESAS", self.view.frame_FACTURA)
         layout_mesas_grid = contenedor_mesas.layout() or QGridLayout(contenedor_mesas)
@@ -68,7 +69,8 @@ class MainPresenter:
         mesa_data = self.model.obtener_mesas()[nombre_mesa]
         zona = mesa_data["zona"].upper()
 
-        self.view.lbl_notificacion.setText(f"📋 [{self.model.rol_actual.upper()}] Gestionando {nombre_mesa} ({zona})")
+        self.view.lbl_notificacion.setText(
+            f"📋 [{self.model.rol_actual.upper()}] Gestionando {nombre_mesa} ({zona})")
 
         if zona == "TERRAZA":
             self.view.lbl_notificacion.setStyleSheet(
@@ -98,21 +100,24 @@ class MainPresenter:
             border = "2.5px solid #2980b9" if es_la_actual else "1px solid #2c3e50"
             font_weight = "bold" if es_la_actual else "normal"
 
-            estilo = f"QPushButton {{ background-color: {bg_color}; color: {text_color}; border: {border}; font-weight: {font_weight}; border-radius: 5px; font-size: 11px; }} "
-            estilo += "QPushButton:hover { background-color: #2c3e50; color: white; }"
+            estilo = (f"QPushButton {{ background-color: {bg_color}; color: {text_color}; "
+                      f"border: {border}; font-weight: {font_weight}; border-radius: 5px; font-size: 11px; }} "
+                      f"QPushButton:hover {{ background-color: #2c3e50; color: white; }}")
             btn.setStyleSheet(estilo)
 
-    # --- CATEGORÍAS Y PRODUCTOS ---
+    # -------------------------------------------------------------------------
+    # CATEGORÍAS Y PRODUCTOS
+    # -------------------------------------------------------------------------
     def dibujar_categorias(self):
         while self.layout_categorias.count():
             item = self.layout_categorias.takeAt(0)
-            if item.widget(): item.widget().deleteLater()
+            if item.widget():
+                item.widget().deleteLater()
 
         columnas_maximas = 4
         fila, columna = 0, 0
-        categorias = self.model.obtener_categorias()
 
-        for cat in categorias:
+        for cat in self.model.obtener_categorias():
             boton_cat = QPushButton()
             boton_cat.setMinimumSize(110, 75)
             ruta_imagen = f"imagenes/{cat['id']}.jpg"
@@ -134,13 +139,13 @@ class MainPresenter:
     def dibujar_productos(self, categoria_id):
         while self.layout_productos.count():
             item = self.layout_productos.takeAt(0)
-            if item.widget(): item.widget().deleteLater()
+            if item.widget():
+                item.widget().deleteLater()
 
-        productos_filtrados = self.model.obtener_productos_por_categoria(categoria_id)
         columnas_maximas = 4
         fila, columna = 0, 0
 
-        for prod in productos_filtrados:
+        for prod in self.model.obtener_productos_por_categoria(categoria_id):
             boton = QPushButton()
             boton.setMinimumSize(120, 90)
             ruta_imagen = f"imagenes/{prod['id']}.jpg"
@@ -169,7 +174,9 @@ class MainPresenter:
         self.actualizar_tabla_factura()
         self.actualizar_estilos_mesas()
 
-    # --- RENDERIZADO DEL TICKET ---
+    # -------------------------------------------------------------------------
+    # TICKET / FACTURA
+    # -------------------------------------------------------------------------
     def actualizar_tabla_factura(self):
         self.view.tabla_factura.setRowCount(0)
         total_general = 0.0
@@ -201,16 +208,20 @@ class MainPresenter:
                 self.view.tabla_factura.setItem(fila, 2, item_precio)
 
             self.view.lbl_total.setText(f"TOTAL: {total_general:.2f}€")
-            self.view.lbl_total.setStyleSheet("color: #2ecc71; font-size: 26px; font-weight: bold; padding-left: 2px;")
+            self.view.lbl_total.setStyleSheet(
+                "color: #2ecc71; font-size: 26px; font-weight: bold; padding-left: 2px;")
         else:
             self.view.lbl_total.setText("SELECCIONE MESA")
-            self.view.lbl_total.setStyleSheet("color: #e67e22; font-size: 24px; font-weight: bold; padding-left: 2px;")
+            self.view.lbl_total.setStyleSheet(
+                "color: #e67e22; font-size: 24px; font-weight: bold; padding-left: 2px;")
 
     def finalizar_cuenta(self):
         mesa_actual = self.model.obtener_mesa_actual()
-        if not mesa_actual: return
+        if not mesa_actual:
+            return
         mesa_data = self.model.obtener_mesas()[mesa_actual]
-        if not mesa_data["ticket"]: return
+        if not mesa_data["ticket"]:
+            return
 
         total = sum(info["precio"] * info["cantidad"] for info in mesa_data["ticket"].values())
         self.view.lbl_notificacion.setText(f"💰 Cuenta Cerrada con éxito: {mesa_actual} pagó {total:.2f}€")
@@ -221,7 +232,67 @@ class MainPresenter:
         self.actualizar_tabla_factura()
         self.actualizar_estilos_mesas()
 
-    # --- PANEL DE ADMINISTRACIÓN ---
+    # -------------------------------------------------------------------------
+    # DIVIDIR CUENTA  (antes: Dividir cuenta.py)
+    # -------------------------------------------------------------------------
+    def dividir_cuenta(self):
+        mesa_actual = self.model.obtener_mesa_actual()
+        if not mesa_actual:
+            QMessageBox.warning(self.view, "Error", "No hay una cuenta cargada o activa.")
+            return
+
+        ticket_actual = self.model.obtener_mesas()[mesa_actual]["ticket"]
+        if not ticket_actual:
+            QMessageBox.warning(self.view, "Operación Inválida", "La cuenta actual está vacía.")
+            return
+
+        total = sum(info["precio"] * info["cantidad"] for info in ticket_actual.values())
+
+        comensales, ok = QInputDialog.getInt(
+            self.view,
+            "Dividir Cuenta",
+            f"Total a dividir: {total:.2f}€\n¿Entre cuántas personas?",
+            value=2,
+            min=1,
+            max=100
+        )
+
+        if ok:
+            pago_por_persona = total / comensales
+            QMessageBox.information(
+                self.view,
+                "Cuenta Dividida",
+                f"💰 Total Mesa: {total:.2f}€\n"
+                f"👥 Comensales: {comensales}\n\n"
+                f"💳 Cada persona paga: {pago_por_persona:.2f}€"
+            )
+
+    # -------------------------------------------------------------------------
+    # CAMBIAR USUARIO  (antes: Cambio de usuario.py)
+    # -------------------------------------------------------------------------
+    def cambiar_usuario(self):
+        from views.login_view import LoginVentana
+
+        dialogo_login = LoginVentana()
+        if dialogo_login.exec():
+            nuevo_rol = dialogo_login.rol_elegido
+            self.model.rol_actual = nuevo_rol
+
+            QMessageBox.information(
+                self.view,
+                "Usuario Cambiado",
+                f"Sesión iniciada como: {nuevo_rol.upper()}"
+            )
+
+            self.view.btn_admin_panel.setVisible(nuevo_rol == "admin")
+
+            # Refrescamos la notificación de mesa para que muestre el nuevo rol
+            if self.model.obtener_mesa_actual():
+                self.seleccionar_mesa(self.model.obtener_mesa_actual())
+
+    # -------------------------------------------------------------------------
+    # PANEL DE ADMINISTRACIÓN
+    # -------------------------------------------------------------------------
     def abrir_panel_administracion(self):
         dialogo = QDialog(self.view)
         dialogo.setWindowTitle("🛠️ Panel de Control - Configuración del Local")
@@ -241,11 +312,10 @@ class MainPresenter:
             lista_items.addItem("--- [ CATEGORÍAS ] ---")
             for c in self.model.obtener_categorias():
                 lista_items.addItem(f"CATEGORIA: {c['nombre']} (ID: {c['id']})")
-
             lista_items.addItem("")
             lista_items.addItem("--- [ PRODUCTOS ] ---")
             for c in self.model.obtener_categorias():
-                for p in self.model.obtener_productos_por_categoria(cat_id := c['id']):
+                for p in self.model.obtener_productos_por_categoria(c['id']):
                     lista_items.addItem(
                         f"PRODUCTO: {p['nombre']} - {p['precio']}€ (ID: {p['id']} | Cat: {p['categoria_id']})")
 
@@ -259,8 +329,10 @@ class MainPresenter:
 
         for btn in [btn_add_cat, btn_add_prod, btn_eliminar]:
             btn.setMinimumHeight(35)
-            btn.setStyleSheet("background-color: #34495e; color: white; font-weight: bold; border-radius: 4px;")
-        btn_eliminar.setStyleSheet("background-color: #c0392b; color: white; font-weight: bold; border-radius: 4px;")
+            btn.setStyleSheet(
+                "background-color: #34495e; color: white; font-weight: bold; border-radius: 4px;")
+        btn_eliminar.setStyleSheet(
+            "background-color: #c0392b; color: white; font-weight: bold; border-radius: 4px;")
 
         def accion_add_categoria():
             nombre, ok1 = QInputDialog.getText(dialogo, "Nueva Categoría", "Nombre de la categoría:")
@@ -276,38 +348,50 @@ class MainPresenter:
         def accion_add_producto():
             nombre, ok1 = QInputDialog.getText(dialogo, "Nuevo Producto", "Nombre del artículo:")
             if ok1 and nombre:
-                precio, ok2 = QInputDialog.getDouble(dialogo, "Nuevo Producto", "Precio base (€):", 1.0, 0.0, 100.0, 2)
+                precio, ok2 = QInputDialog.getDouble(
+                    dialogo, "Nuevo Producto", "Precio base (€):", 1.0, 0.0, 100.0, 2)
                 if ok2:
-                    cat_id, ok3 = QInputDialog.getText(dialogo, "Nuevo Producto", "ID Categoría a la que pertenece:")
+                    cat_id, ok3 = QInputDialog.getText(
+                        dialogo, "Nuevo Producto", "ID Categoría a la que pertenece:")
                     if ok3 and cat_id:
                         p_id = nombre.lower().replace(" ", "_")
                         self.model.datos_tpv.setdefault("productos", []).append({
-                            "id": p_id, "categoria_id": cat_id.lower().strip(), "nombre": nombre.upper().strip(),
+                            "id": p_id,
+                            "categoria_id": cat_id.lower().strip(),
+                            "nombre": nombre.upper().strip(),
                             "precio": precio
                         })
                         self.model.guardar_json()
                         refrescar_lista_admin()
                         while self.layout_productos.count():
                             item = self.layout_productos.takeAt(0)
-                            if item.widget(): item.widget().deleteLater()
+                            if item.widget():
+                                item.widget().deleteLater()
 
         def accion_eliminar():
             item_seleccionado = lista_items.currentItem()
-            if not item_seleccionado: return
+            if not item_seleccionado:
+                return
             texto = item_seleccionado.text()
+            if "ID:" not in texto:
+                return
 
-            if "ID:" in texto:
-                id_a_borrar = texto.split("ID: ")[1].split(")")[0].split(" |")[0].strip()
-                if "CATEGORIA:" in texto:
-                    self.model.datos_tpv["categorias"] = [c for c in self.model.datos_tpv.get("categorias", []) if
-                                                          c["id"] != id_a_borrar]
-                elif "PRODUCTO:" in texto:
-                    self.model.datos_tpv["productos"] = [p for p in self.model.datos_tpv.get("productos", []) if
-                                                         p["id"] != id_a_borrar]
+            id_a_borrar = texto.split("ID: ")[1].split(")")[0].split(" |")[0].strip()
 
-                self.model.guardar_json()
-                refrescar_lista_admin()
-                self.dibujar_categorias()
+            if "CATEGORIA:" in texto:
+                self.model.datos_tpv["categorias"] = [
+                    c for c in self.model.datos_tpv.get("categorias", [])
+                    if c["id"] != id_a_borrar
+                ]
+            elif "PRODUCTO:" in texto:
+                self.model.datos_tpv["productos"] = [
+                    p for p in self.model.datos_tpv.get("productos", [])
+                    if p["id"] != id_a_borrar
+                ]
+
+            self.model.guardar_json()
+            refrescar_lista_admin()
+            self.dibujar_categorias()
 
         btn_add_cat.clicked.connect(accion_add_categoria)
         btn_add_prod.clicked.connect(accion_add_producto)
@@ -318,36 +402,3 @@ class MainPresenter:
         layout_botones.addWidget(btn_eliminar)
         layout_principal.addLayout(layout_botones)
         dialogo.exec()
-
-    def llamar_dividir_cuenta(self):
-        try:
-            # 1. Le "inyectamos" a la Vista los datos que el script antiguo espera encontrar
-            self.view.mesa_actual = self.model.obtener_mesa_actual()
-            self.view.mesas = self.model.obtener_mesas()
-
-            # 2. Le prestamos las funciones del presentador para que el script pueda refrescar la pantalla
-            self.view.actualizar_tabla_factura = self.actualizar_tabla_factura
-            # Por si tu script antiguo usaba el nombre viejo o el nuevo para los estilos:
-            self.view.estilos_mesas = self.actualizar_estilos_mesas
-            self.view.actualizar_estilos_mesas = self.actualizar_estilos_mesas
-
-            # 3. Llamamos al script externo pasándole self.view (¡Evita el crash porque sí es un QWidget!)
-            modulo_dividir = __import__("Dividir cuenta")
-            modulo_dividir.abrir_dividir_cuenta(self.view)
-
-        except Exception as e:
-            # Si hay algún error lógico en el script, lo capturamos e imprimimos sin cerrar el programa
-            import traceback
-            print(f"⚠️ Error al ejecutar Dividir Cuenta:\n{traceback.format_exc()}")
-    def llamar_cambio_usuario(self):
-        try:
-            modulo_cambio = __import__("Cambio de usuario")
-            # Recomendado cambiar a 'self' si el script necesita interactuar con el presentador
-            modulo_cambio.abrir_cambio_usuario(self.view)
-
-            # Al regresar, refrescamos el rol en el modelo y actualizamos visibilidad
-            self.model.rol_actual = getattr(self.view, 'rol_elegido', self.model.rol_actual)
-            self.view.btn_admin_panel.setVisible(self.model.rol_actual == "admin")
-            self.seleccionar_mesa(self.model.obtener_mesa_actual())
-        except ModuleNotFoundError:
-            pass
