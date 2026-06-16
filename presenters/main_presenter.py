@@ -319,14 +319,26 @@ class MainPresenter:
         layout_principal.addLayout(layout_botones)
         dialogo.exec()
 
-    # --- LLAMADAS MODULARES A SCRIPTS EXTERNOS ---
     def llamar_dividir_cuenta(self):
         try:
-            modulo_dividir = __import__("Dividir cuenta")
-            modulo_dividir.abrir_dividir_cuenta(self)
-        except ModuleNotFoundError:
-            pass
+            # 1. Le "inyectamos" a la Vista los datos que el script antiguo espera encontrar
+            self.view.mesa_actual = self.model.obtener_mesa_actual()
+            self.view.mesas = self.model.obtener_mesas()
 
+            # 2. Le prestamos las funciones del presentador para que el script pueda refrescar la pantalla
+            self.view.actualizar_tabla_factura = self.actualizar_tabla_factura
+            # Por si tu script antiguo usaba el nombre viejo o el nuevo para los estilos:
+            self.view.estilos_mesas = self.actualizar_estilos_mesas
+            self.view.actualizar_estilos_mesas = self.actualizar_estilos_mesas
+
+            # 3. Llamamos al script externo pasándole self.view (¡Evita el crash porque sí es un QWidget!)
+            modulo_dividir = __import__("Dividir cuenta")
+            modulo_dividir.abrir_dividir_cuenta(self.view)
+
+        except Exception as e:
+            # Si hay algún error lógico en el script, lo capturamos e imprimimos sin cerrar el programa
+            import traceback
+            print(f"⚠️ Error al ejecutar Dividir Cuenta:\n{traceback.format_exc()}")
     def llamar_cambio_usuario(self):
         try:
             modulo_cambio = __import__("Cambio de usuario")

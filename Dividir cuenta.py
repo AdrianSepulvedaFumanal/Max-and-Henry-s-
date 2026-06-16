@@ -1,27 +1,32 @@
 from PyQt6.QtWidgets import QInputDialog, QMessageBox
 
-
 def abrir_dividir_cuenta(self):
-    # 1. Recuperar el total actual de la cuenta activa.
-    # (Sustituye 'self.total_actual' por la variable exacta donde guardes el precio de la mesa)
-    try:
-        total = self.total_actual
-    except AttributeError:
+    # 1. Recuperamos la mesa y el ticket desde los datos que nos prestó el presentador
+    mesa_actual = getattr(self, 'mesa_actual', None)
+    mesas = getattr(self, 'mesas', {})
+
+    if not mesa_actual or mesa_actual not in mesas:
         QMessageBox.warning(self, "Error", "No hay una cuenta cargada o activa.")
         return
 
-    if total <= 0:
+    ticket_actual = mesas[mesa_actual]["ticket"]
+
+    # Si el ticket no tiene productos, avisamos
+    if not ticket_actual:
         QMessageBox.warning(self, "Operación Inválida", "La cuenta actual está vacía.")
         return
 
-    # 2. Abrir ventanita pidiendo el número de comensales
+    # Calculamos el total de la mesa sumando precio * cantidad de cada producto
+    total = sum(info["precio"] * info["cantidad"] for info in ticket_actual.values())
+
+    # 2. Abrir ventanita pidiendo el número de comensales (añadimos el total en el texto para que quede mejor)
     comensales, ok = QInputDialog.getInt(
         self,
         "Dividir Cuenta",
-        "¿Entre cuántas personas se va a dividir la cuenta?",
+        f"Total a dividir: {total:.2f}€\n¿Entre cuántas personas?",
         value=2,  # Valor por defecto
-        min=1,  # Mínimo 1 persona
-        max=100  # Máximo 100 personas
+        min=1,    # Mínimo 1 persona
+        max=100   # Máximo 100 personas
     )
 
     # 3. Si el usuario pulsa "OK" en la ventana, hacemos la matemática
