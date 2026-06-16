@@ -23,18 +23,23 @@ def main():
 
     except ModuleNotFoundError:
         # Salvavidas por si el archivo Login no está accesible en la raíz
-        QMessageBox.critical(None, "Error de Sistema", "No se encontró el archivo 'Login.py'.")
+        QMessageBox.critical(None, "Error de Sistema", "No se encontró el archivo 'Login.py' en la raíz.")
         sys.exit(1)
 
-    # 2. Una vez logueado con éxito, inicializamos el TPV con el rol correcto
+    # 2. Una vez logueado con éxito, inicializamos los componentes del TPV
     model = DataBaseModel()
-    model.rol_actual = rol_usuario  # Guardamos el rol validado en el modelo
+    model.rol_actual = rol_usuario  # Inyectamos el rol validado del login en el modelo
 
     view = MainView()
+
+    # === EL TRUCO DE CORRECCIÓN VISUAL ===
+    # Primero mostramos la pantalla para que Qt inicialice todos los contenedores reales en el OS
+    view.mostrar_pantalla()
+
+    # Luego instanciamos el presentador, que ahora sí encontrará los layouts listos para pintar
     presenter = MainPresenter(view, model)
 
-    # 3. Mostramos el TPV al fin
-    view.mostrar_pantalla()
+    # 3. Iniciamos el bucle principal de eventos de la aplicación gráfica
     sys.exit(app.exec())
 
 
