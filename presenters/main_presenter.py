@@ -13,12 +13,20 @@ class MainPresenter:
 
         self.botones_mesas = {}
 
-        # 1. Asegurar layouts dinámicos desde la vista
-        self.layout_categorias = self.view.frame_PRODUCTOS.layout() or QGridLayout(self.view.frame_PRODUCTOS)
-        self.layout_productos = self.view.stackedWidget.currentWidget().layout() or QGridLayout(
-            self.view.stackedWidget.currentWidget())
+        # 1. Asegurar layouts dinámicos en los contenedores de la Vista
+        if self.view.frame_PRODUCTOS.layout() is None:
+            self.layout_categorias = QGridLayout(self.view.frame_PRODUCTOS)
+        else:
+            self.layout_categorias = self.view.frame_PRODUCTOS.layout()
 
-        # 2. Configurar y pintar las mesas en su panel
+        # Forzamos un QGridLayout limpio en la página actual del stackedWidget para los productos
+        widget_actual_productos = self.view.stackedWidget.currentWidget()
+        if widget_actual_productos.layout() is None:
+            self.layout_productos = QGridLayout(widget_actual_productos)
+        else:
+            self.layout_productos = widget_actual_productos.layout()
+
+        # 2. Configurar y pintar las mesas en su panel (Corregido: Llamada única)
         self.configurar_panel_mesas()
 
         # 3. Conectar los botones fijos del panel lateral a sus funciones
@@ -35,7 +43,7 @@ class MainPresenter:
         self.dibujar_categorias()
         self.seleccionar_mesa("Mesa 1")
 
-    # --- SITEMA DE MESAS ---
+    # --- SISTEMA DE MESAS ---
     def configurar_panel_mesas(self):
         contenedor_mesas = getattr(self.view, "frame_MESAS", self.view.frame_FACTURA)
         layout_mesas_grid = contenedor_mesas.layout() or QGridLayout(contenedor_mesas)
@@ -315,14 +323,16 @@ class MainPresenter:
     def llamar_dividir_cuenta(self):
         try:
             modulo_dividir = __import__("Dividir cuenta")
-            modulo_dividir.abrir_dividir_cuenta(self.view)  # Nota: adaptaremos esto según pida el script
+            modulo_dividir.abrir_dividir_cuenta(self)
         except ModuleNotFoundError:
             pass
 
     def llamar_cambio_usuario(self):
         try:
             modulo_cambio = __import__("Cambio de usuario")
+            # Recomendado cambiar a 'self' si el script necesita interactuar con el presentador
             modulo_cambio.abrir_cambio_usuario(self.view)
+
             # Al regresar, refrescamos el rol en el modelo y actualizamos visibilidad
             self.model.rol_actual = getattr(self.view, 'rol_elegido', self.model.rol_actual)
             self.view.btn_admin_panel.setVisible(self.model.rol_actual == "admin")
