@@ -47,7 +47,7 @@ class DataBaseModel:
     def obtener_productos_por_categoria(self, categoria_id):
         return [p for p in self.datos_tpv.get("productos", []) if p["categoria_id"] == categoria_id]
 
-    # --- MÉTODOS DE GESTIÓN DE ESTADO ---
+    # --- NUEVOS MÉTODOS DE GESTIÓN DE ESTADO ---
     def obtener_mesas(self):
         return self.mesas
 
