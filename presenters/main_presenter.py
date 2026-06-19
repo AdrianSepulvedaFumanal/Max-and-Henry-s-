@@ -233,7 +233,7 @@ class MainPresenter:
         self.actualizar_estilos_mesas()
 
     # -------------------------------------------------------------------------
-    # DIVIDIR CUENTA  (antes: Dividir cuenta.py)
+    # DIVIDIR CUENTA
     # -------------------------------------------------------------------------
     def dividir_cuenta(self):
         mesa_actual = self.model.obtener_mesa_actual()
@@ -268,7 +268,7 @@ class MainPresenter:
             )
 
     # -------------------------------------------------------------------------
-    # CAMBIAR USUARIO  (antes: Cambio de usuario.py)
+    # CAMBIAR USUARIO
     # -------------------------------------------------------------------------
     def cambiar_usuario(self):
         from views.login_view import LoginVentana
@@ -291,7 +291,7 @@ class MainPresenter:
                 self.seleccionar_mesa(self.model.obtener_mesa_actual())
 
     # -------------------------------------------------------------------------
-    # PANEL DE ADMINISTRACIÓN
+    # PANEL DE ADMINISTRACION
     # -------------------------------------------------------------------------
     def abrir_panel_administracion(self):
         dialogo = QDialog(self.view)
