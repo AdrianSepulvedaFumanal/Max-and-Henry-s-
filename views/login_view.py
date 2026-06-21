@@ -50,7 +50,7 @@ class LoginVentana(QDialog):
 
         self.combo_usuarios.currentIndexChanged.connect(self.controlar_visibilidad_password)
 
-        # Botonera
+        # Botones
         layout_botones = QHBoxLayout()
         self.btn_cancelar = QPushButton("Cancelar")
         self.btn_cancelar.setObjectName("btn_cancelar")
